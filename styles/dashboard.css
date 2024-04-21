@@ -33,7 +33,7 @@
     padding: 0px 15px;
   }
   
-  .confirm-button {
+  .confirm-button, #submitCategoryBtn {
     font-family: 'poppins';
     background-color: var(--main-green);
     border-radius: 15px;

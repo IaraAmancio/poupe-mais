@@ -60,6 +60,60 @@
     </main>
   </dialog>
 
+  <dialog id="settings-modal">
+    <main>
+      <span>
+        <img src="assets/settings-icon.png">
+      </span>
+      <form id="add-settings-form" class="add-form">
+        <p class="common-text">Configure sua conta</p>
+        <p class="common-text" style="text-align: left;">Nome</p>
+        <input id="settings-name" class="input" placeholder="Neto" type="text">
+        <p class="common-text">Renda Mensal</p>
+        <input id="settings-value" class="input" placeholder="R$ 000.000,00" type="number">
+
+        <button class="confirm-button">
+          <p>
+            Confirmar
+          </p>
+          <img src="assets/send-icon.png" />
+        </button>
+        <a>Apagar conta</a>
+        <a>Redefinir conta</a>
+      </form>
+    </main>
+  </dialog>
+
+  <dialog id="chart-modal">
+    <main>
+      <span>
+        <img src="assets/line-chart-icon.png">
+      </span>
+      <p class="common-text">Movimento da conta</p>
+
+      <canvas id="lineChart"  width="265" height="217"></canvas>
+      
+
+    </main>
+  </dialog>
+
+  <dialog id="create-categoria-modal">
+    <main>
+      
+
+      <form id="add-income-form" class="add-form">
+        <p class="common-text">Adicione uma categoria</p>
+        <input id="categoryNameInput" class="input" placeholder="Categoria" type="text" />
+        <button id="submitCategoryBtn">
+          <p>
+            Confirmar
+          </p>
+          <img src="assets/send-icon.png" />
+        </button>
+      </form>
+    </main>
+  </dialog>
+
   <!-- Header -->
   <header>
     <img id="logo-ux" src="assets/ux-logo.svg" alt="Logo UX">
@@ -75,7 +129,7 @@
       <section class="greetings">
         <img src="assets/user-image.png">
         <div>
-          <p class="common-text">Boa tarde</p>
+          <p class="common-text" id="saudacao">Boa tarde</p>
           <h1 id="username"></h1>
         </div>
       </section>
@@ -138,6 +192,11 @@
 
   <script src="js/dashboard.js"></script>
   <script src="js/modal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+ 
+
+  
+
 </body>
 
 </html>

@@ -1,3 +1,14 @@
+function exibirHoras(){
+  let hora_atual = new Date().getHours();
+  if (hora_atual > 6 && hora_atual < 12) return 'Bom dia';
+  if (hora_atual >= 12 && hora_atual < 18) return 'Boa tarde';
+  if (hora_atual >= 18) return 'Boa noite';
+  return 'Boa noite';
+}
+
+
+
+
 const url = "https://poupe-mais-api.vercel.app";
 const token = sessionStorage.getItem("token");
 
@@ -13,8 +24,12 @@ logoutBtn.addEventListener("click", function (event) {
     logout();
 });
 
+const horas = document.getElementById("saudacao");
+
+horas.innerHTML = exibirHoras();
+
 // Obter os dados do usuário
-async function getUserData() {
+async function getUserData(callback) {
     const usernameElement = document.getElementById("username");
     const incomeElement = document.getElementById("total-incomes");
     const expenseElement = document.getElementById("total-expense");
@@ -40,6 +55,8 @@ async function getUserData() {
 
         const incomes = transactions.filter(({ type }) => type === "INCOME");
         const expenses = transactions.filter(({ type }) => type === "EXPENSE");
+        
+     
 
         const totalIncomes = incomes.reduce((accumulator, currentValue) => { return accumulator + currentValue.value }, 0);
         const totalExpenses = expenses.reduce((accumulator, currentValue) => { return accumulator + currentValue.value }, 0);
@@ -47,75 +64,130 @@ async function getUserData() {
 
         incomeElement.innerHTML = `<span>+ R$ ${totalIncomes}</span>`;
         expenseElement.innerHTML = `<span>- R$ ${totalExpenses}</span>`;
+
+        
         totalElement.innerHTML = `<span>R$ ${total}</span>`;
+    
+        if (total < 0){
+          totalElement.style.color = 'red';
+        }
+        else {
+          totalElement.style.color = 'green';
+        }
+        callback({ incomes, expenses, total });
+        
     })
     .catch(function (error) {
         console.error(error);
     })
+   
 }
 
 getUserData();
 
+
+
 // Obter categorias
 async function getCategories() {
-    const categories = document.querySelector(".categories");
-  
-    await fetch(`${url}/category/list`, {
+  const categories = document.querySelector(".categories");
+
+  await fetch(`${url}/category/list`, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
       }
-    })
-      .then((response) => {
-        if(!response.ok) {
+  })
+  .then((response) => {
+      if(!response.ok) {
           throw new Error(response.statusText);
-        }
-  
-        return response.json();
-      })
-      .then((data) => {
-        const categoriesData = data.body;
-  
-        const categoriesChildes = categoriesData.map((category) => {
+      }
+
+      return response.json();
+  })
+  .then((data) => {
+      const categoriesData = data.body;
+
+      const categoriesChildes = categoriesData.map((category) => {
           const li = document.createElement("li");
           li.setAttribute("class", "category");
-  
+
           const img = document.createElement("img");
           img.setAttribute("src", "./assets/elipse-verde.svg");
           img.setAttribute("alt", "Elipse Verde");
-  
+
           const span = document.createElement("span");
           span.textContent = category.categoryName;
-          
+        
           li.appendChild(img);
           li.appendChild(span);
-  
+
           return li;
-        });
-  
-        const liCadastrarCategoria = document.createElement("li");
-        liCadastrarCategoria.setAttribute("class", "btn-new-categorie");
-  
-        const img = document.createElement("img");
-        img.setAttribute("src", "./assets/elipse-azul-2.svg");
-        img.setAttribute("alt", "Elipse Azul");
-  
-        const span = document.createElement("span");
-        span.textContent = "Cadastrar nova categoria";
-  
-        liCadastrarCategoria.appendChild(img);
-        liCadastrarCategoria.appendChild(span);
-  
-        categories.append(...categoriesChildes);
-        categories.appendChild(liCadastrarCategoria);
-      })
-      .catch((error) => {
-        console.error("this", error);
       });
+
+      const liCadastrarCategoria = document.createElement("li");
+      liCadastrarCategoria.setAttribute("class", "btn-new-categorie");
+
+      const img = document.createElement("img");
+      img.setAttribute("src", "./assets/elipse-azul-2.svg");
+      img.setAttribute("alt", "Elipse Azul");
+
+      const span = document.createElement("span");
+      span.textContent = "Cadastrar nova categoria";
+      
+      liCadastrarCategoria.appendChild(img);
+      liCadastrarCategoria.appendChild(span);
+
+      categories.append(...categoriesChildes);
+      categories.appendChild(liCadastrarCategoria);
+
+      // Atribui a lógica de abrir o modal ao botão "Cadastrar nova categoria"
+      const modal = document.getElementById("create-categoria-modal");
+      liCadastrarCategoria.addEventListener("click", () => {
+          modal.showModal();
+      });
+
+      const submitCategoryBtn = document.getElementById("submitCategoryBtn");
+      submitCategoryBtn.addEventListener("click", () => {
+          const categoryName = document.getElementById("categoryNameInput").value;
+          if (categoryName) {
+            try {
+                  
+               // Se a categoria foi cadastrada com sucesso, adicione-a na página
+                const li = document.createElement("li");
+                li.setAttribute("class", "category");
+    
+                const img = document.createElement("img");
+                img.setAttribute("src", "./assets/elipse-verde.svg");
+                img.setAttribute("alt", "Elipse Verde");
+    
+                const span = document.createElement("span");
+                span.textContent = categoryName;
+    
+                li.appendChild(img);
+                li.appendChild(span);
+    
+                categories.append(li);
+    
+                console.log("Nova categoria cadastrada:", categoryName);
+                modal.close();
+            } catch (error) {
+                console.error("Erro ao cadastrar nova categoria:", error);
+            }
+        } else {
+            console.log("Operação de cadastro de nova categoria cancelada.");
+            modal.close();
+        }
+      });
+
+  })
+  .catch((error) => {
+      console.error("this", error);
+  });
 }
 
 getCategories();
+
   
 // Obter opções
 async function getOptions() {
